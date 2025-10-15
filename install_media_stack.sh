@@ -233,13 +233,24 @@ success "Containers are up and running!"
 # ---------------------------------------------------------------------------
 #  Enable external access for SABnzbd
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+#  Enable external access for SABnzbd (wait until config exists)
+# ---------------------------------------------------------------------------
 SAB_CONFIG_PATH="$HOME/media-stack/config/sabnzbd/sabnzbd.ini"
 
+info "Waiting for SABnzbd config to be created..."
+for i in {1..30}; do
+    if [ -f "$SAB_CONFIG_PATH" ]; then
+        break
+    fi
+    sleep 2
+done
+
 if [ -f "$SAB_CONFIG_PATH" ]; then
-    sed -i 's/^inet_exposure = 0/inet_exposure = 5/' "$SAB_CONFIG_PATH"
+    sed -i 's/^inet_exposure *= *.*/inet_exposure = 5/' "$SAB_CONFIG_PATH"
     success "SABnzbd external access enabled (inet_exposure = 5)"
 else
-    info "SABnzbd config not found yet. Will apply inet_exposure=5 after first run."
+    error "SABnzbd config file not found after waiting. Please restart the container manually."
 fi
 
 # ---------------------------------------------------------------------------
@@ -257,7 +268,6 @@ printf "%-15s %-8s http://%s:%s\n" "Portainer" "9000" "$IP" "9000"
 printf "%-15s %-8s http://%s:%s\n" "SABnzbd" "8080" "$IP" "8080"
 printf "%-15s %-8s http://%s:%s\n" "Deluge" "8112" "$IP" "8112"
 printf "%-15s %-8s http://%s:%s\n" "Jackett" "9117" "$IP" "9117"
-printf "%-15s %-8s http://%s:%s\n" "FlareSolverr" "8191" "$IP" "8191"
 printf "%-15s %-8s http://%s:%s\n" "Radarr" "7878" "$IP" "7878"
 printf "%-15s %-8s http://%s:%s\n" "Sonarr" "8989" "$IP" "8989"
 printf "%-15s %-8s http://%s:%s\n" "Profilarr" "8282" "$IP" "8282"
