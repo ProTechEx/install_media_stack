@@ -192,7 +192,7 @@ services:
     environment:
       - TZ=Europe/Istanbul
     ports:
-      - "8282:8282"
+      - "6868:6868"
     volumes:
       - ./config/profilarr:/config
     depends_on:
