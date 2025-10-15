@@ -246,13 +246,17 @@ done
 if [ -f "$SAB_CONFIG_PATH" ]; then
     sed -i 's/^inet_exposure *= *.*/inet_exposure = 5/' "$SAB_CONFIG_PATH"
     success "SABnzbd external access enabled (inet_exposure = 5)"
-    
-    # Restart SABnzbd to apply changes
-    docker restart sabnzbd >/dev/null 2>&1 && success "SABnzbd restarted successfully to apply configuration."
+
+    # Restart SABnzbd to apply new config
+    info "Restarting SABnzbd to apply changes..."
+    if docker restart sabnzbd >/dev/null; then
+        success "SABnzbd restarted successfully and is now externally accessible."
+    else
+        error "Failed to restart SABnzbd — please restart it manually using: docker restart sabnzbd"
+    fi
 else
     error "SABnzbd config not found after waiting. Please restart the container manually."
 fi
-
 
 # ---------------------------------------------------------------------------
 #  Summary output
