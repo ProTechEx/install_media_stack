@@ -3,9 +3,10 @@ set -e
 
 # ---------------------------------------------------------------------------
 #  Media Stack Auto Installer (Ubuntu / Debian)
+#  Includes Profilarr + SABnzbd external access setup
 # ---------------------------------------------------------------------------
 
-# Helper function for colored output
+# Helper functions
 info()    { echo -e "\033[1;34m[INFO]\033[0m $1"; }
 success() { echo -e "\033[1;32m[SUCCESS]\033[0m $1"; }
 error()   { echo -e "\033[1;31m[ERROR]\033[0m $1"; }
@@ -30,7 +31,7 @@ install_docker() {
     apt-get update -y
     apt-get install -y ca-certificates curl gnupg lsb-release
 
-    # Remove any old Docker versions
+    # Remove old versions if any
     apt-get remove -y docker docker-engine docker.io containerd runc || true
 
     # Add Docker’s official GPG key
@@ -38,7 +39,7 @@ install_docker() {
     curl -fsSL https://download.docker.com/linux/$OS/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
     chmod a+r /etc/apt/keyrings/docker.gpg
 
-    # Add repository
+    # Add Docker repository
     echo \
       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
       https://download.docker.com/linux/$OS \
@@ -52,7 +53,7 @@ install_docker() {
     success "Docker installed successfully!"
 }
 
-# Check and install if not present
+# Install Docker if missing
 if ! command -v docker &>/dev/null; then
     if [[ "$OS" == "ubuntu" || "$OS" == "debian" ]]; then
         install_docker
@@ -65,10 +66,10 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-#  Setup Directories
+#  Create directory structure
 # ---------------------------------------------------------------------------
 info "Preparing directories..."
-mkdir -p ~/media-stack/{config/{radarr,sonarr,sabnzbd,deluge,jackett,requesterr},downloads,incomplete,media/{movies,tv},portainer_data}
+mkdir -p ~/media-stack/{config/{radarr,sonarr,sabnzbd,deluge,jackett,requesterr,profilarr},downloads,incomplete,media/{movies,tv},portainer_data}
 cd ~/media-stack
 
 # ---------------------------------------------------------------------------
@@ -184,6 +185,20 @@ services:
       - sabnzbd
       - deluge
 
+  profilarr:
+    image: santiagosayshey/profilarr:latest
+    container_name: profilarr
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Istanbul
+    ports:
+      - "8282:8282"
+    volumes:
+      - ./config/profilarr:/config
+    depends_on:
+      - sonarr
+      - radarr
+
   requesterr:
     image: thomst08/requestrr:latest
     container_name: requesterr
@@ -208,15 +223,27 @@ services:
 EOF
 
 # ---------------------------------------------------------------------------
-#  Start Containers
+#  Start stack
 # ---------------------------------------------------------------------------
-info "Pulling images and starting stack..."
+info "Starting containers..."
 docker compose pull
 docker compose up -d
-success "Containers are up!"
+success "Containers are up and running!"
 
 # ---------------------------------------------------------------------------
-#  Display Summary
+#  Enable external access for SABnzbd
+# ---------------------------------------------------------------------------
+SAB_CONFIG_PATH="$HOME/media-stack/config/sabnzbd/sabnzbd.ini"
+
+if [ -f "$SAB_CONFIG_PATH" ]; then
+    sed -i 's/^inet_exposure = 0/inet_exposure = 5/' "$SAB_CONFIG_PATH"
+    success "SABnzbd external access enabled (inet_exposure = 5)"
+else
+    info "SABnzbd config not found yet. Will apply inet_exposure=5 after first run."
+fi
+
+# ---------------------------------------------------------------------------
+#  Summary output
 # ---------------------------------------------------------------------------
 IP=$(curl -s https://api.ipify.org || echo "localhost")
 
@@ -233,6 +260,8 @@ printf "%-15s %-8s http://%s:%s\n" "Jackett" "9117" "$IP" "9117"
 printf "%-15s %-8s http://%s:%s\n" "FlareSolverr" "8191" "$IP" "8191"
 printf "%-15s %-8s http://%s:%s\n" "Radarr" "7878" "$IP" "7878"
 printf "%-15s %-8s http://%s:%s\n" "Sonarr" "8989" "$IP" "8989"
+printf "%-15s %-8s http://%s:%s\n" "Profilarr" "8282" "$IP" "8282"
 printf "%-15s %-8s http://%s:%s\n" "Requesterr" "4545" "$IP" "4545"
 echo ""
 echo "📁 Installed in: ~/media-stack"
+echo ""
