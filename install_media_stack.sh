@@ -82,6 +82,7 @@ services:
     image: portainer/portainer-ce:latest
     container_name: portainer
     restart: unless-stopped
+    command: -H unix:///var/run/docker.sock
     ports:
       - "9000:9000"
       - "9443:9443"
