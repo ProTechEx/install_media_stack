@@ -8,7 +8,7 @@ It deploys:
 - **Radarr** — Movie automation  
 - **Sonarr** — TV automation  
 - **SABnzbd** — Usenet downloader  
-- **Deluge** — Torrent client  
+- **Deluge** — Torrent client  (Default password: deluge)
 - **Jackett** — Indexer bridge  
 - **FlareSolverr** — Cloudflare solver (used by indexers)  
 - **Requestrr** — Media request bot  
