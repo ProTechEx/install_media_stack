@@ -231,10 +231,7 @@ docker compose up -d
 success "Containers are up and running!"
 
 # ---------------------------------------------------------------------------
-#  Enable external access for SABnzbd
-# ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
-#  Enable external access for SABnzbd (wait until config exists)
+#  Enable external access for SABnzbd (wait until config exists + restart)
 # ---------------------------------------------------------------------------
 SAB_CONFIG_PATH="$HOME/media-stack/config/sabnzbd/sabnzbd.ini"
 
@@ -249,9 +246,13 @@ done
 if [ -f "$SAB_CONFIG_PATH" ]; then
     sed -i 's/^inet_exposure *= *.*/inet_exposure = 5/' "$SAB_CONFIG_PATH"
     success "SABnzbd external access enabled (inet_exposure = 5)"
+    
+    # Restart SABnzbd to apply changes
+    docker restart sabnzbd >/dev/null 2>&1 && success "SABnzbd restarted successfully to apply configuration."
 else
-    error "SABnzbd config file not found after waiting. Please restart the container manually."
+    error "SABnzbd config not found after waiting. Please restart the container manually."
 fi
+
 
 # ---------------------------------------------------------------------------
 #  Summary output
