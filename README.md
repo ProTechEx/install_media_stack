@@ -11,6 +11,7 @@ It deploys:
 - **Deluge** — Torrent client  (Default password: deluge)
 - **Jackett** — Indexer bridge  
 - **FlareSolverr** — Cloudflare solver (used by indexers)  
+- **Profilarr** — Create Quality Profiles for Radarr & Sonarr
 - **Requestrr** — Media request bot  
 - **Watchtower** — Auto-update containers  
 
@@ -66,6 +67,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/ProTechEx/install_media_stac
 │   ├── sabnzbd/
 │   ├── deluge/
 │   ├── jackett/
+│   ├── profilarr/
 │   └── requesterr/
 ├── downloads/
 ├── incomplete/
@@ -89,9 +91,9 @@ bash <(curl -fsSL https://raw.githubusercontent.com/ProTechEx/install_media_stac
 | SABnzbd       | 8080 | [http://your-server-ip:8080](http://your-server-ip:8080) |
 | Deluge        | 8112 | [http://your-server-ip:8112](http://your-server-ip:8112) |
 | Jackett       | 9117 | [http://your-server-ip:9117](http://your-server-ip:9117) |
-| FlareSolverr  | 8191 | [http://your-server-ip:8191](http://your-server-ip:8191) |
 | Radarr        | 7878 | [http://your-server-ip:7878](http://your-server-ip:7878) |
 | Sonarr        | 8989 | [http://your-server-ip:8989](http://your-server-ip:8989) |
+| Profilarr     | 6868 | [http://your-server-ip:6868](http://your-server-ip:6868) |
 | Requestrr     | 4545 | [http://your-server-ip:4545](http://your-server-ip:4545) |
 
 > The installer’s final summary shows these with your **actual public IP**.
