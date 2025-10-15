@@ -126,6 +126,7 @@ docker compose pull && docker compose up -d
 cd ~/media-stack
 docker compose down -v
 rm -rf ~/media-stack
+cd ..
 ```
 
 > This removes containers, volumes, and all persisted data under `~/media-stack`.
